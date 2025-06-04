@@ -24,7 +24,8 @@ const IncluVerseLanding = () => {
     'Bus Buddy Bol',
     'Sign Language Translator',
     'Voice Feedback',
-    'AI-Powered Chatbot'
+    'AI-Powered Chatbot',
+    'Emergency'
   ];
 
   return (
@@ -49,11 +50,9 @@ const IncluVerseLanding = () => {
                 className="text-gray-700 hover:text-blue-600 flex items-center transition-colors duration-200 font-medium text-lg"
               >
                 Solutions
-                <ChevronDown className="ml-1 h-5 w-5" />
+                <ChevronDown className={`ml-1 h-5 w-5 transition-transform duration-200 ${isMenuOpen ? 'rotate-180' : ''}`} />
               </button>
-              <button className="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition-all duration-200 shadow-md hover:shadow-lg">
-                Get Started
-              </button>
+              
             </nav>
             <button 
               onClick={toggleMenu}
