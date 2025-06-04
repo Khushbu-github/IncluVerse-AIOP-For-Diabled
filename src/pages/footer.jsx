@@ -20,7 +20,7 @@ const Footer = () => {
             <h4 className="text-xl font-semibold mb-4 flex items-center gap-2">
               <Lightbulb size={20} /> IncluVerse
             </h4>
-            <p className="text-gray-600 text-sm leading-relaxed">
+            <p className="text-gray-600 text-l leading-relaxed">
               IncluVerse is an all-in-one accessibility platform designed for people with disabilities. From assistive tech to real-time support, we're building inclusive solutions to empower independence and dignity.
             </p>
           </div>
@@ -30,7 +30,7 @@ const Footer = () => {
             <h4 className="text-xl font-semibold mb-4 flex items-center gap-2">
               <Users size={20} /> About Us
             </h4>
-            <p className="text-gray-600 text-sm leading-relaxed">
+            <p className="text-gray-600 text-l leading-relaxed">
               We are a passionate group of developers, designers, and accessibility advocates working together to make technology inclusive for everyone. Our mission is to bridge the digital divide through empathy and innovation.
             </p>
           </div>
@@ -40,7 +40,7 @@ const Footer = () => {
             <h4 className="text-xl font-semibold mb-4 flex items-center gap-2">
               <Info size={20} /> Quick Links
             </h4>
-            <ul className="text-sm space-y-2">
+            <ul className="text-l space-y-2">
               <li className="flex items-center gap-2 hover:text-blue-600 transition">
                 <Home size={16} />
                 <a href="#">Home</a>
