@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Menu, X, MessageCircle, Users, Laptop, Accessibility, ChevronDown, Eye, Ear, HandHeart } from 'lucide-react';
+import Footer from './pages/footer';
+
 
 const IncluVerseLanding = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -28,9 +30,9 @@ const IncluVerseLanding = () => {
   return (
     <div className="min-h-screen bg-gray-50" style={{ fontFamily: 'HelveticaNeueW01-55Roma, Helvetica, Arial, sans-serif' }}>
       {/* Enhanced Professional Header */}
-      <header className="bg-white shadow-lg relative border-b border-gray-200">
+      <header className="bg-white shadow-lg fixed top-0 left-0 right-0 z-50 border-b border-gray-200">
         <div className="w-full px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-8 lg:py-10">
+          <div className="flex justify-between items-center py-8 lg:py-8">
             <div className="flex items-center">
               <div className="text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight">IncluVerse</div>
               <div className="hidden lg:block ml-4 h-8 w-px bg-gray-300"></div>
@@ -299,7 +301,9 @@ const IncluVerseLanding = () => {
         <MessageCircle className="h-6 w-6" />
         <span className="hidden sm:inline font-semibold text-lg">Need Help?</span>
       </button>
+      <Footer/>
     </div>
+    
   );
 };
 
