@@ -41,7 +41,7 @@ const IncluVerseLanding = () => {
             <nav className="hidden md:flex items-center space-x-12">
               <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium text-lg">Home</a>
               <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium text-lg">About</a>
-              <a href="#" className="text-gray-700 hover:text-blue-600 transition-colors duration-200 font-medium text-lg">Services</a>
+             
               <button 
                 onClick={toggleMenu}
                 className="text-gray-700 hover:text-blue-600 flex items-center transition-colors duration-200 font-medium text-lg"
@@ -91,9 +91,7 @@ const IncluVerseLanding = () => {
           <div className="flex flex-col lg:flex-row items-center gap-16">
             <div className="lg:w-1/2 text-center lg:text-left">
               <div className="mb-6">
-                <span className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold tracking-wide uppercase">
-                  Accessibility Innovation
-                </span>
+          
               </div>
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-8 leading-tight whitespace-nowrap">
                 Breaking Barriers <div className="text-blue-600">Together</div>
@@ -102,9 +100,7 @@ const IncluVerseLanding = () => {
                 Enhancing Lives of Diverse Communities through cutting-edge accessibility solutions and inclusive technology.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <button className="bg-blue-600 text-white px-10 py-4 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl">
-                  Explore Solutions
-                </button>
+             
                 <button className="border-2 border-gray-300 text-gray-700 px-10 py-4 rounded-xl text-lg font-semibold hover:border-blue-600 hover:text-blue-600 transition-all duration-300">
                   Learn More
                 </button>
