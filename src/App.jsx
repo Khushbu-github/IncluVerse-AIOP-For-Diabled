@@ -87,7 +87,7 @@ const IncluVerseLanding = () => {
       </header>
 
       {/* Enhanced Hero Section */}
-      <section className="bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 py-24 lg:py-32">
+      <section className="bg-gradient-to-br from-gray-50 via-blue-50 to-indigo-50 py-28 lg:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center gap-16">
             <div className="lg:w-1/2 text-center lg:text-left">
@@ -217,84 +217,7 @@ const IncluVerseLanding = () => {
         </div>
       </section>
 
-      {/* Newsletter Section */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gray-50 rounded-3xl p-10 lg:p-16 border border-gray-200">
-            <div className="flex flex-col lg:flex-row items-start justify-between gap-16">
-              <div className="lg:w-1/2">
-                <div className="text-4xl font-bold text-gray-900 mb-8">IncluVerse</div>
-                <div className="text-gray-600 space-y-4 text-lg">
-                  <p>
-                    <span className="font-semibold">Accessibility Hotline:</span>
-                    <span className="ml-3">1-800-INCLUVERSE</span>
-                  </p>
-                  <p>
-                    <span className="font-semibold">Support Email:</span>
-                    <span className="ml-3">support@incluverse.com</span>
-                  </p>
-                  <p>
-                    <span className="font-semibold">Community:</span>
-                    <span className="ml-3">Available 24/7 for peer support</span>
-                  </p>
-                </div>
-              </div>
-              
-              <div className="lg:w-1/2">
-                <h3 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-8">
-                  Join Our Inclusive Community
-                </h3>
-                <p className="text-gray-600 mb-8 text-lg">
-                  Stay updated with new accessibility features, community events, and resources designed to enhance your independence and quality of life.
-                </p>
-                <div className="space-y-6">
-                  <div>
-                    <div className="block text-sm font-semibold text-gray-700 mb-3">
-                      Email Address *
-                    </div>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full px-6 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-lg"
-                      placeholder="Enter your email address"
-                      aria-label="Email address for newsletter subscription"
-                    />
-                  </div>
-                  
-                  <div className="flex items-start">
-                    <input
-                      type="checkbox"
-                      checked={subscribeChecked}
-                      onChange={(e) => setSubscribeChecked(e.target.checked)}
-                      className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
-                      aria-label="Subscribe to newsletter"
-                    />
-                    <div className="ml-4 text-gray-600">
-                      Yes, I want to receive updates about new accessibility features and community events. *
-                    </div>
-                  </div>
-                  
-                  <button
-                    onClick={handleSubscribe}
-                    className="w-full bg-blue-600 text-white py-4 px-8 rounded-xl font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg text-lg"
-                    aria-label="Subscribe to IncluVerse newsletter"
-                  >
-                    Join Our Community
-                  </button>
-                </div>
-                
-                <div className="mt-8">
-                  <a href="#" className="text-blue-600 hover:text-blue-800 underline transition-colors duration-200 font-medium">
-                    Accessibility & Privacy Policy
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
+ 
       {/* Enhanced Chat Button */}
       <button className="fixed bottom-8 right-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-5 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 flex items-center space-x-3 z-50" aria-label="Open accessibility chat">
         <MessageCircle className="h-6 w-6" />
