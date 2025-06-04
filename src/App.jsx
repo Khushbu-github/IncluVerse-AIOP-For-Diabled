@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Menu, X, MessageCircle, Users, Laptop, Accessibility, ChevronDown } from 'lucide-react';
+import { Menu, X, MessageCircle, Users, Laptop, Accessibility, ChevronDown, Eye, Ear, HandHeart } from 'lucide-react';
 
 const IncluVerseLanding = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -17,7 +17,7 @@ const IncluVerseLanding = () => {
   };
 
   const menuItems = [
-    'PDFs/images analyser',
+    'PDFs/Images Analyzer',
     'Grievance Handler',
     'Bus Buddy Bol',
     'Sign Language Translator',
@@ -35,7 +35,7 @@ const IncluVerseLanding = () => {
               <div className="text-3xl lg:text-4xl font-bold text-gray-900 tracking-tight">IncluVerse</div>
               <div className="hidden lg:block ml-4 h-8 w-px bg-gray-300"></div>
               <div className="hidden lg:block ml-4 text-sm text-gray-600 font-medium">
-                Accessibility Solutions
+                All-in-One Platform for Disabled People
               </div>
             </div>
             <nav className="hidden md:flex items-center space-x-12">
@@ -67,7 +67,7 @@ const IncluVerseLanding = () => {
           <div className="absolute top-full left-0 right-0 bg-white shadow-xl z-50 border-t border-gray-200">
             <div className="w-full px-4 sm:px-6 lg:px-8 py-8">
               <div className="mb-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Our Solutions</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">Our Accessibility Solutions</h3>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {menuItems.map((item, index) => (
@@ -91,18 +91,22 @@ const IncluVerseLanding = () => {
           <div className="flex flex-col lg:flex-row items-center gap-16">
             <div className="lg:w-1/2 text-center lg:text-left">
               <div className="mb-6">
-          
+                <span className="inline-block px-6 py-3 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold tracking-wide uppercase">
+                  Empowering Independence
+                </span>
               </div>
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-8 leading-tight whitespace-nowrap">
+               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 mb-8 leading-tight whitespace-nowrap">
                 Breaking Barriers <div className="text-blue-600">Together</div>
               </h1>
               <p className="text-xl lg:text-2xl text-gray-600 mb-10 leading-relaxed max-w-2xl">
-                Enhancing Lives of Diverse Communities through cutting-edge accessibility solutions and inclusive technology.
+                The all-in-one platform designed by and for disabled people, featuring AI-powered tools, community support, and assistive technologies that enhance independence and quality of life.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-             
-                <button className="border-2 border-gray-300 text-gray-700 px-10 py-4 rounded-xl text-lg font-semibold hover:border-blue-600 hover:text-blue-600 transition-all duration-300">
+                <button className="bg-blue-600 text-white px-10 py-4 rounded-xl text-lg font-semibold hover:bg-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105">
                   Learn More
+                </button>
+                <button className="border-2 border-gray-300 text-gray-700 px-10 py-4 rounded-xl text-lg font-semibold hover:border-blue-600 hover:text-blue-600 transition-all duration-300">
+                  Explore Features
                 </button>
               </div>
             </div>
@@ -110,7 +114,7 @@ const IncluVerseLanding = () => {
               <div className="relative">
                 <div className="bg-gradient-to-br from-blue-100 via-purple-50 to-green-100 rounded-3xl p-12 h-[500px] flex items-center justify-center shadow-2xl">
                   <div className="bg-white rounded-2xl shadow-2xl p-12 w-96 h-64 flex items-center justify-center transform hover:scale-105 transition-transform duration-300">
-                    <Laptop className="h-24 w-24 text-blue-500" />
+                    <Accessibility className="h-24 w-24 text-blue-500" />
                   </div>
                 </div>
                 {/* Enhanced floating elements */}
@@ -129,17 +133,33 @@ const IncluVerseLanding = () => {
           <div className="text-center mb-20">
             <div className="mb-6">
               <span className="inline-block px-4 py-2 bg-gray-100 text-gray-700 rounded-full text-sm font-semibold tracking-wide uppercase">
-                Our Services
+                Our Core Services
               </span>
             </div>
-            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">Comprehensive Solutions</h2>
+            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">Comprehensive Disability Support</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-              We provide innovative accessibility solutions designed to create an inclusive digital world for everyone, regardless of their abilities.
+              From assistive technologies to community connection, we provide everything disabled people need to thrive independently and confidently in their daily lives.
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {/* Community Empowerment */}
+            {/* Assistive Technology */}
+            <div className="bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
+              <div className="h-72 bg-gradient-to-br from-blue-200 via-indigo-100 to-purple-200 flex items-center justify-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-purple-400/20"></div>
+                <Eye className="h-24 w-24 text-blue-600 relative z-10" />
+              </div>
+              <div className="p-8">
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                  Assistive Technology
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Advanced AI-powered tools including text-to-speech, image recognition, sign language translation, and document analysis to support various disabilities.
+                </p>
+              </div>
+            </div>
+
+            {/* Community Support */}
             <div className="bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
               <div className="h-72 bg-gradient-to-br from-green-200 via-emerald-100 to-blue-200 flex items-center justify-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-green-400/20 to-blue-400/20"></div>
@@ -147,42 +167,26 @@ const IncluVerseLanding = () => {
               </div>
               <div className="p-8">
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  Community Empowerment
+                  Community Support
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Building stronger, more inclusive communities through collaborative initiatives and support systems that foster connection and growth.
+                  Connect with other disabled individuals, share experiences, access peer support, and build meaningful relationships within our inclusive community.
                 </p>
               </div>
             </div>
 
-            {/* Access Tech */}
-            <div className="bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100">
-              <div className="h-72 bg-gradient-to-br from-blue-200 via-indigo-100 to-purple-200 flex items-center justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-400/20 to-purple-400/20"></div>
-                <Laptop className="h-24 w-24 text-blue-600 relative z-10" />
-              </div>
-              <div className="p-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  Access Tech
-                </h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Innovative technology solutions designed to enhance accessibility and digital inclusion for all users, breaking down digital barriers.
-                </p>
-              </div>
-            </div>
-
-            {/* Accessibility */}
+            {/* Daily Living Tools */}
             <div className="bg-white rounded-3xl shadow-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 md:col-span-2 lg:col-span-1 border border-gray-100">
               <div className="h-72 bg-gradient-to-br from-purple-200 via-pink-100 to-rose-200 flex items-center justify-center relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-400/20 to-pink-400/20"></div>
-                <Accessibility className="h-24 w-24 text-purple-600 relative z-10" />
+                <HandHeart className="h-24 w-24 text-purple-600 relative z-10" />
               </div>
               <div className="p-8">
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">
-                  Accessibility
+                  Daily Living Support
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Comprehensive accessibility services and tools to ensure equal access and participation for everyone in the digital landscape.
+                  Practical tools for everyday challenges including transportation assistance, voice feedback systems, and grievance handling to enhance independence.
                 </p>
               </div>
             </div>
@@ -196,13 +200,16 @@ const IncluVerseLanding = () => {
           <div className="text-center">
             <div className="mb-8">
               <span className="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold tracking-wide uppercase">
-                Our Purpose
+                Our Mission
               </span>
             </div>
-            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-12">Mission & Vision</h2>
+            <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-12">Empowering Disabled Lives</h2>
             <div className="bg-white rounded-3xl shadow-xl p-10 lg:p-16 border border-gray-200">
-              <p className="text-xl lg:text-2xl text-gray-700 leading-relaxed">
-                IncluVerse is committed to revolutionizing accessibility for individuals with diverse needs worldwide. Our platform integrates cutting-edge AI technology, community engagement features, and stringent privacy and security measures to empower and serve the diverse community globally, ensuring a more inclusive and accessible future for all.
+              <p className="text-xl lg:text-2xl text-gray-700 leading-relaxed mb-8">
+                IncluVerse is the world's first comprehensive platform designed exclusively for disabled people, by disabled people. We combine cutting-edge AI technology, assistive tools, and community support to break down barriers and create a world where disability is not a limitation.
+              </p>
+              <p className="text-lg text-gray-600 leading-relaxed">
+                Our platform addresses the unique challenges faced by people with visual, hearing, mobility, and cognitive disabilities, providing personalized solutions that enhance independence, foster community connection, and ensure equal access to information and opportunities.
               </p>
             </div>
           </div>
@@ -217,21 +224,28 @@ const IncluVerseLanding = () => {
               <div className="lg:w-1/2">
                 <div className="text-4xl font-bold text-gray-900 mb-8">IncluVerse</div>
                 <div className="text-gray-600 space-y-4 text-lg">
-                  <p className="flex items-center">
-                    <span className="font-semibold">Phone:</span>
-                    <span className="ml-3">123-456-7890</span>
+                  <p>
+                    <span className="font-semibold">Accessibility Hotline:</span>
+                    <span className="ml-3">1-800-INCLUVERSE</span>
                   </p>
-                  <p className="flex items-center">
-                    <span className="font-semibold">Email:</span>
-                    <span className="ml-3">info@incluverse.com</span>
+                  <p>
+                    <span className="font-semibold">Support Email:</span>
+                    <span className="ml-3">support@incluverse.com</span>
+                  </p>
+                  <p>
+                    <span className="font-semibold">Community:</span>
+                    <span className="ml-3">Available 24/7 for peer support</span>
                   </p>
                 </div>
               </div>
               
               <div className="lg:w-1/2">
                 <h3 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-8">
-                  Empowering Diversity and Inclusion
+                  Join Our Inclusive Community
                 </h3>
+                <p className="text-gray-600 mb-8 text-lg">
+                  Stay updated with new accessibility features, community events, and resources designed to enhance your independence and quality of life.
+                </p>
                 <div className="space-y-6">
                   <div>
                     <div className="block text-sm font-semibold text-gray-700 mb-3">
@@ -243,6 +257,7 @@ const IncluVerseLanding = () => {
                       onChange={(e) => setEmail(e.target.value)}
                       className="w-full px-6 py-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-lg"
                       placeholder="Enter your email address"
+                      aria-label="Email address for newsletter subscription"
                     />
                   </div>
                   
@@ -252,23 +267,25 @@ const IncluVerseLanding = () => {
                       checked={subscribeChecked}
                       onChange={(e) => setSubscribeChecked(e.target.checked)}
                       className="h-5 w-5 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
+                      aria-label="Subscribe to newsletter"
                     />
                     <div className="ml-4 text-gray-600">
-                      Yes, subscribe me to your newsletter. *
+                      Yes, I want to receive updates about new accessibility features and community events. *
                     </div>
                   </div>
                   
                   <button
                     onClick={handleSubscribe}
                     className="w-full bg-blue-600 text-white py-4 px-8 rounded-xl font-semibold hover:bg-blue-700 transition-all duration-300 transform hover:scale-105 shadow-lg text-lg"
+                    aria-label="Subscribe to IncluVerse newsletter"
                   >
-                    Subscribe Now
+                    Join Our Community
                   </button>
                 </div>
                 
                 <div className="mt-8">
                   <a href="#" className="text-blue-600 hover:text-blue-800 underline transition-colors duration-200 font-medium">
-                    Privacy Policy
+                    Accessibility & Privacy Policy
                   </a>
                 </div>
               </div>
@@ -278,9 +295,9 @@ const IncluVerseLanding = () => {
       </section>
 
       {/* Enhanced Chat Button */}
-      <button className="fixed bottom-8 right-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-5 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 flex items-center space-x-3 z-50">
+      <button className="fixed bottom-8 right-8 bg-gradient-to-r from-blue-600 to-purple-600 text-white p-5 rounded-full shadow-2xl hover:shadow-3xl transition-all duration-300 transform hover:scale-110 flex items-center space-x-3 z-50" aria-label="Open accessibility chat">
         <MessageCircle className="h-6 w-6" />
-        <span className="hidden sm:inline font-semibold text-lg">Let's Chat!</span>
+        <span className="hidden sm:inline font-semibold text-lg">Need Help?</span>
       </button>
     </div>
   );
