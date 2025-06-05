@@ -16,7 +16,7 @@ export default function AppRoutes() {
       <Route path="/greviance" element={<Grievance />} />
       <Route path="/voicefeedback" element={<VoiceFeed />} />
       <Route path="/signlanguage" element={<SignLanguage />} />
-      <Route path="/imganalyzer" element={<ImgAnalyzer />} />
+      <Route path="/img_analyzer" element={<ImgAnalyzer />} />
     </Routes>
   );
 }
