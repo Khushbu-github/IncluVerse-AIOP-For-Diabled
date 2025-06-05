@@ -15,7 +15,8 @@ const BusBuddyBol = () => {
   const speechSynthesisRef = useRef(null);
 
   // Gemini API configuration
-  const GEMINI_API_KEY = 'AIzaSyC64xyltUNB4662C50SZIZ_Hr7r8Lt-N1k';
+  const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+
   const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`;
 
   // Language configurations

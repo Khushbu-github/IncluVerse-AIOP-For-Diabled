@@ -52,18 +52,28 @@ const GrievanceHandler = () => {
       recognitionRef.current.lang = selectedLanguage;
 
       recognitionRef.current.onresult = (event) => {
-        let finalTranscript = '';
-        let interimTranscript = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript;
-          if (event.results[i].isFinal) {
-            finalTranscript += transcript;
-          } else {
-            interimTranscript += transcript;
-          }
-        }
-        setTranscript(prev => prev + finalTranscript + interimTranscript);
-      };
+  let finalTranscript = '';
+  let interimTranscript = '';
+  
+  for (let i = event.resultIndex; i < event.results.length; i++) {
+    const transcript = event.results[i][0].transcript;
+    if (event.results[i].isFinal) {
+      finalTranscript += transcript;
+    } else {
+      interimTranscript += transcript;
+    }
+  }
+  
+  // Only add final transcript to permanent state
+  if (finalTranscript) {
+    setTranscript(prev => prev + finalTranscript);
+  }
+  
+  // Optionally handle interim transcript separately for live preview
+  if (interimTranscript) {
+    setInterimTranscript(interimTranscript); // separate state for live preview
+  }
+};
 
       recognitionRef.current.onerror = (event) => {
         console.error('Speech recognition error:', event.error);
