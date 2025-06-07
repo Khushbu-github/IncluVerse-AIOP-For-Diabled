@@ -1,27 +1,237 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Upload, Play, PauseCircle, Image as ImageIcon, FileText, Download, Settings2 } from 'lucide-react';
-import Tesseract from 'tesseract.js';
-import * as pdfjs from 'pdfjs-dist';
-import workerSrc from 'pdfjs-dist/build/pdf.worker.mjs?url';
+import React, { useState, useRef, useEffect } from "react";
+import {
+  Upload,
+  Play,
+  PauseCircle,
+  Image as ImageIcon,
+  FileText,
+  Download,
+  Settings2,
+} from "lucide-react";
+import Tesseract from "tesseract.js";
+import * as pdfjs from "pdfjs-dist";
+import workerSrc from "pdfjs-dist/build/pdf.worker.mjs?url";
+
+const callGroqAPI = async (textToTranslate, targetLang = "Hindi") => {
+  try {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          {
+            role: "system",
+            content: `You are a translator. Translate the following English text to ${targetLang}.`
+          },
+          {
+            role: "user",
+            content: textToTranslate
+          }
+        ],
+        temperature: 0.3
+      })
+    });
+
+    if (!response.ok) {
+      // Log the full error response
+      const error = await response.json();
+      console.error('Groq API error:', error);
+      throw new Error(`Groq API error: ${JSON.stringify(error)}`);
+    }
+
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content?.trim();
+  } catch (error) {
+    console.error('Groq API call failed:', error);
+    throw error;
+  }
+};
+
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
 const ImageAnalyzer = () => {
-  const languages = [
-    { code: 'en-US', name: 'English' },
-    { code: 'hi-IN', name: 'हिंदी (Hindi)' },
-    { code: 'kn-IN', name: 'ಕನ್ನಡ (Kannada)' },
-    { code: 'ta-IN', name: 'தமிழ் (Tamil)' },
-    { code: 'te-IN', name: 'తెలుగు (Telugu)' }
-  ];
+  // CSS styles for different scripts
+  const styles = {
+    fontHindi: {
+      fontFamily: "'Noto Sans Devanagari', sans-serif",
+    },
+    fontKannada: {
+      fontFamily: "'Noto Sans Kannada', sans-serif",
+    },
+    fontTamil: {
+      fontFamily: "'Noto Sans Tamil', sans-serif",
+    },
+    fontTelugu: {
+      fontFamily: "'Noto Sans Telugu', sans-serif",
+    }
+  };
+
+  const getLanguageStyle = (langCode) => {
+    switch (langCode) {
+      case 'hi-IN':
+        return styles.fontHindi;
+      case 'kn-IN':
+        return styles.fontKannada;
+      case 'ta-IN':
+        return styles.fontTamil;
+      case 'te-IN':
+        return styles.fontTelugu;
+      default:
+        return {};
+    }
+  };
+
+  const languages = {
+    "en-US": {
+      name: "English",
+      translations: {
+        title: "PDF/Image Analyzer",
+        subtitle: "Empowering Independence",
+        description:
+          "Upload an image or PDF and experience accessible, AI-powered text extraction and reading in your preferred language.",
+        uploadText: "Click or drag & drop to upload image or PDF",
+        analyzeButton: "Analyze Content",
+        analyzingText: "Analyzing...",
+        extractedText: "Extracted Text",
+        translatedText: "Translated Text",
+        translationPlaceholder: "Translated text will appear here...",
+        copyButton: "Copy",
+        textCopied: "Text copied!",
+        invalidFile: "Please upload a valid image or PDF file.",
+        speakButton: "Speak",
+        stopButton: "Stop",
+        downloadButton: "Download",
+        contrastLabel: "Contrast",
+        brightnessLabel: "Brightness",
+        grayscaleLabel: "Grayscale",
+        imagePreview: "Image Preview",
+      },
+    },
+    "hi-IN": {
+      name: "हिंदी",
+      translations: {
+        title: "पीडीएफ/इमेज विश्लेषक",
+        subtitle: "स्वतंत्रता को सशक्त बनाना",
+        description:
+          "एक छवि या पीडीएफ अपलोड करें और अपनी पसंदीदा भाषा में सुलभ, एआई-संचालित पाठ निष्कर्षण और पठन का अनुभव करें।",
+        uploadText: "छवि या पीडीएफ अपलोड करने के लिए क्लिक करें या खींचें और छोड़ें",
+        analyzeButton: "विश्लेषण करें",
+        analyzingText: "विश्लेषण कर रहे हैं...",
+        extractedText: "निकाला गया पाठ",
+        translatedText: "अनुवादित पाठ",
+        translationPlaceholder: "अनुवादित पाठ यहां दिखाई देगा...",
+        invalidFile: "कृपया एक वैध छवि या पीडीएफ फ़ाइल अपलोड करें।",
+        speakButton: "बोलें",
+        stopButton: "रुकें",
+        downloadButton: "डाउनलोड करें",
+        contrastLabel: "कंट्रास्ट",
+        brightnessLabel: "चमक",
+        grayscaleLabel: "ग्रेस्केल",
+        imagePreview: "छवि पूर्वावलोकन",
+      },
+    },
+    "kn-IN": {
+      name: "ಕನ್ನಡ",
+      translations: {
+        title: "ಪಿಡಿಎಫ್/ಚಿತ್ರ ವಿಶ್ಲೇಷಕ",
+        subtitle: "ಸ್ವಾತಂತ್ರ್ಯವನ್ನು ಸ357ಕ್ತಗೊಳಿಸುವುದು",
+        description:
+          "ಚಿತ್ರ ಅಥವಾ ಪಿಡಿಎಫ್ ಅನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ ಮತ್ತು ನಿಮ್ಮ ಆದ್ಯತೆಯ ಭಾಷೆಯಲ್ಲಿ ಪ್ರವೇಶಿಸಬಹುದಾದ, AI-ಸಾಮರ್ಥ್ಯದ ಪಠ್ಯ ಹೊರತೆಗೆಯುವಿಕೆ ಮತ್ತು ಓದುವಿಕೆಯನ್ನು ಅನುಭವಿಸಿ.",
+        uploadText: "ಚಿತ್ರ ಅಥವಾ ಪಿಡಿಎಫ್ ಅಪ್‌ಲೋಡ್ ಮಾಡಲು ಕ್ಲಿಕ್ ಮಾಡಿ ಅಥವಾ ಎಳೆದು ಬಿಡಿ",
+        analyzeButton: "ವಿಶ್ಲೇಷಿಸಿ",
+        analyzingText: "ವಿಶ್ಲೇಷಿಸಲಾಗುತ್ತಿದೆ...",
+        extractedText: "ಹೊರತೆಗೆದ ಪಠ್ಯ",
+        translatedText: "ಅನುವಾದಿತ ಪಠ್ಯ",
+        translationPlaceholder: "ಅನುವಾದಿತ ಪಠ್ಯವು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ...",
+        invalidFile: "ದಯವಿಟ್ಟು ಮಾನ್ಯವಾದ ಚಿತ್ರ ಅಥವಾ ಪಿಡಿಎಫ್ ಫೈಲ್ ಅನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.",
+        speakButton: "ಮಾತನಾಡಿ",
+        stopButton: "ನಿಲ್ಲಿಸಿ",
+        downloadButton: "ಡೌನ್‌ಲೋಡ್",
+        contrastLabel: "ಕಾಂಟ್ರಾಸ್ಟ್",
+        brightnessLabel: "ಪ್ರಕಾಶಮಾನತೆ",
+        grayscaleLabel: "ಗ್ರೇಸ್ಕೇಲ್",
+        imagePreview: "ಚಿತ್ರ ಪೂರ್ವವೀಕ್ಷಣೆ",
+      },
+    },
+    "ta-IN": {
+      name: "தமிழ்",
+      translations: {
+        title: "பிடிஎஃப்/படம் பகுப்பாய்வி",
+        subtitle: "சுதந்த274த்தை மேம்படுத்துதல்",
+        description:
+          "படம் அல்லது பிடிஎஃப் பதிவேற்றி உங்கள் விருப்பமான மொழியில் அணுகக்கூடிய, AI-இயக்கப்பட்ட உரை பிரித்தெடுத்தல் மற்றும் வாசிப்பை அனுபவியுங்கள்.",
+        uploadText: "படம் அல்லது பிடிஎஃப் பதிவேற்ற கிளிக் செய்யவும் அல்லது இழுத்து விடவும்",
+        analyzeButton: "பகுப்பாய்வு செய்",
+        analyzingText: "பகுப்பாய்வு செய்கிறது...",
+        extractedText: "பிரித்தெடுக்கப்பட்ட உரை",
+        translatedText: "மொழிபெயர்க்கப்பட்ட உரை",
+        translationPlaceholder: "மொழிபெயர்க்கப்பட்ட உரை இங்கே தோன்றும்...",
+        invalidFile: "தயவுசெய்து சரியான படம் அல்லது பிடிஎஃப் கோப்பைப் பதிவேற்றவும்.",
+        speakButton: "பேசு",
+        stopButton: "நிறுத்து",
+        downloadButton: "பதிவிறக்கு",
+        contrastLabel: "மாறுபாடு",
+        brightnessLabel: "பிரகாசம்",
+        grayscaleLabel: "கிரேஸ்கேல்",
+        imagePreview: "பட முன்னோட்டம்",
+      },
+    },
+    "te-IN": {
+      name: "తెలుగు",
+      translations: {
+        title: "పిడిఎఫ్/ఇమేజ్ విశ్లేషకుడు",
+        subtitle: "స్వాతంత్ర్యాన్ని బలోపేతం చేయడం",
+        description:
+          "చిత్రం లేదా పిడిఎఫ్‌ను అప్‌లోడ్ చేసి మీకు ఇష్టమైన భాషలో అందుబాటులో ఉన్న, AI-ఆధారిత వచన సేకరణ మరియు చదవడాన్ని అనుభవించండి.",
+        uploadText: "చిత్రం లేదా పిడిఎఫ్ అప్‌లోడ్ చేయడానికి క్లిక్ చేయండి లేదా డ్రాగ్ చేసి డ్రాప్ చేయండి",
+        analyzeButton: "విశ్లేషించు",
+        analyzingText: "విశ్లేషిస్తోంది...",
+        extractedText: "సేకరించిన వచనం",
+        translatedText: "అనువదించబడిన వచనం",
+        translationPlaceholder: "అనువదించబడిన వచನం ఇక్కడ కనిపిస్తుంది...",
+        invalidFile: "ద422చేసి చెల్లుబాటు అయ్యే చిత్రం లేదా పిడిఎఫ్ ఫైల్‌ను అప్‌లోడ్ చేయండి.",
+        speakButton: "మాట్లాడు",
+        stopButton: "ఆపు",
+        downloadButton: "డౌన్‌లోడ్",
+        contrastLabel: "కాంట్రాస్ట్",
+        brightnessLabel: "ప్రకాశం",
+        grayscaleLabel: "గ్రేస్కేల్",
+        imagePreview: "చిత్రం ప్రివ్యూ",
+      },
+    },
+  };
+
+  const getLanguageClass = (langCode) => {
+    switch (langCode) {
+      case 'hi-IN':
+        return 'font-hindi';
+      case 'kn-IN':
+        return 'font-kannada';
+      case 'ta-IN':
+        return 'font-tamil';
+      case 'te-IN':
+        return 'font-telugu';
+      default:
+        return '';
+    }
+  };
 
   const [file, setFile] = useState(null);
   const [fileType, setFileType] = useState(null);
-  const [extractedText, setExtractedText] = useState('');
+  const [extractedText, setExtractedText] = useState("");
+  const [translatedText, setTranslatedText] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isTranslating, setIsTranslating] = useState(false);
   const [progress, setProgress] = useState(0);
-  const [speaking, setSpeaking] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState('en-US');
+  const [extractedSpeaking, setExtractedSpeaking] = useState(false);
+  const [translatedSpeaking, setTranslatedSpeaking] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState("en-US");
+  const [targetLanguage, setTargetLanguage] = useState("en-US");
   const [imageData, setImageData] = useState(null);
   const [availableVoices, setAvailableVoices] = useState([]);
   const [imageSettings, setImageSettings] = useState({
@@ -50,15 +260,18 @@ const ImageAnalyzer = () => {
   const handleFileChange = (event) => {
     const selectedFile = event.target.files[0];
     if (selectedFile) {
-      if (!selectedFile.type.match('image.*|application/pdf')) {
-        alert("Please upload a valid image or PDF file.");
+      if (!selectedFile.type.match("image.*|application/pdf")) {
+        alert(currentTranslations.invalidFile);
         return;
       }
       setFile(selectedFile);
       setFileType(selectedFile.type);
-      setExtractedText('');
+      setExtractedText("");
+      setTranslatedText("");
       setProgress(0);
-      if (speaking) stopSpeaking();
+      if (extractedSpeaking || translatedSpeaking) {
+        stopSpeaking();
+      }
       setImageData(URL.createObjectURL(selectedFile));
     }
   };
@@ -66,17 +279,17 @@ const ImageAnalyzer = () => {
   const processImage = async (imageFile) => {
     try {
       const imageUrl = URL.createObjectURL(imageFile);
-      const result = await Tesseract.recognize(imageUrl, 'eng', {
-        logger: info => {
-          if (info.status === 'recognizing text') {
+      const result = await Tesseract.recognize(imageUrl, "eng", {
+        logger: (info) => {
+          if (info.status === "recognizing text") {
             setProgress(info.progress);
           }
-        }
+        },
       });
       return result.data.text;
     } catch (error) {
-      console.error('Error processing image:', error);
-      return '';
+      console.error("Error processing image:", error);
+      return "";
     }
   };
 
@@ -84,165 +297,497 @@ const ImageAnalyzer = () => {
     try {
       const arrayBuffer = await pdfFile.arrayBuffer();
       const pdf = await pdfjs.getDocument(arrayBuffer).promise;
-      let text = '';
+      let text = "";
       for (let i = 1; i <= pdf.numPages; i++) {
         const page = await pdf.getPage(i);
         const content = await page.getTextContent();
-        text += content.items.map(item => item.str).join(' ') + '\n';
+        text += content.items.map((item) => item.str).join(" ") + "\n";
       }
       return text;
     } catch (error) {
-      console.error('Error processing PDF:', error);
-      return '';
+      console.error("Error processing PDF:", error);
+      return "";
+    }
+  };
+
+  const translateText = async (text, targetLang) => {
+    try {
+      // Map language codes to language names for the API prompt
+      const languageMap = {
+        'hi-IN': 'Hindi',
+        'kn-IN': 'Kannada',
+        'ta-IN': 'Tamil',
+        'te-IN': 'Telugu',
+        'en-US': 'English'
+      };
+      const targetApiLang = languageMap[targetLang];
+      
+      if (!targetApiLang) {
+        throw new Error('Invalid target language');
+      }
+
+      // Split text into smaller chunks (to avoid hitting API limits)
+      const chunks = text.match(/[^.!?]+[.!?]+/g) || [text];
+      let translatedChunks = [];
+
+      for (const chunk of chunks) {
+        if (!chunk.trim()) continue;
+        const result = await callGroqAPI(chunk.trim(), targetApiLang);
+        translatedChunks.push(result);
+        // Add small delay between chunks
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+
+      return translatedChunks.join(' ');
+    } catch (error) {
+      console.error('Translation error:', error);
+      throw error;
+    }
+  };
+
+  const handleTranslate = async () => {
+    if (!extractedText || !targetLanguage) return;
+    
+    setIsTranslating(true);
+    try {
+      // Add a small delay to prevent rapid consecutive requests
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const translatedResult = await translateText(extractedText, targetLanguage);
+      if (translatedResult) {
+        setTranslatedText(translatedResult);
+      } else {
+        setTranslatedText('Translation failed. The text could not be translated.');
+      }
+    } catch (error) {
+      console.error('Translation failed:', error);
+      setTranslatedText('Translation service unavailable. Please try again later.');
+    } finally {
+      setIsTranslating(false);
     }
   };
 
   const handleAnalyze = async () => {
     if (!file) return;
+    
     setIsProcessing(true);
     setProgress(0);
-    let text = '';
+    
     try {
-      if (fileType.startsWith('image/')) {
+      let text = "";
+      if (fileType.startsWith("image/")) {
         text = await processImage(file);
-      } else if (fileType === 'application/pdf') {
+      } else if (fileType === "application/pdf") {
         text = await processPDF(file);
       }
+      
       setExtractedText(text);
+      
+      // Automatically translate if a non-English language is selected
+      if (targetLanguage !== "en-US") {
+        await handleTranslate();
+      }
     } catch (error) {
-      console.error('Error analyzing file:', error);
+      console.error("Error analyzing file:", error);
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const startSpeaking = () => {
-    if (!extractedText || speaking) return;
-    stopSpeaking();
-    const utterance = new SpeechSynthesisUtterance(extractedText);
-    const voice = availableVoices.find(v => v.lang.startsWith(selectedLanguage)) || availableVoices.find(v => v.lang === 'en-US');
-    utterance.voice = voice;
-    utterance.lang = selectedLanguage;
-    speechSynthesisRef.current = utterance;
-    utterance.onend = () => setSpeaking(false);
-    setSpeaking(true);
-    window.speechSynthesis.speak(utterance);
+  const startExtractedSpeaking = (text, lang) => {
+    if (!text) return;
+
+    try {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang;
+      
+      const voices = window.speechSynthesis.getVoices();
+      const voice = voices.find(v => v.lang.startsWith(lang.split('-')[0]));
+      
+      if (voice) {
+        utterance.voice = voice;
+      } else {
+        console.warn(`No voice found for language ${lang}, using default voice`);
+      }
+
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+
+      utterance.onerror = (event) => {
+        console.error('Speech synthesis error:', event);
+        setExtractedSpeaking(false);
+      };
+
+      utterance.onend = () => {
+        setExtractedSpeaking(false);
+      };
+
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+      setExtractedSpeaking(true);
+    } catch (error) {
+      console.error('Speech synthesis error:', error);
+      setExtractedSpeaking(false);
+    }
+  };
+
+  const startTranslatedSpeaking = (text, lang) => {
+    if (!text) return;
+
+    try {
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = lang;
+      
+      const voices = window.speechSynthesis.getVoices();
+      console.log('Available voices:', voices.map(v => `${v.name} (${v.lang})`));
+      console.log('Target language:', lang);
+      
+      // Try to find an exact match first
+      let voice = voices.find(v => v.lang === lang);
+      
+      // If no exact match, try to find a match for the base language
+      if (!voice) {
+        const baseLang = lang.split('-')[0];
+        voice = voices.find(v => v.lang.startsWith(baseLang));
+      }
+      
+      if (voice) {
+        console.log('Selected voice:', `${voice.name} (${voice.lang})`);
+        utterance.voice = voice;
+      } else {
+        console.warn(`No voice found for language ${lang}, using default voice`);
+      }
+
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+
+      utterance.onerror = (event) => {
+        console.error('Speech synthesis error:', event);
+        setTranslatedSpeaking(false);
+      };
+
+      utterance.onend = () => {
+        setTranslatedSpeaking(false);
+      };
+
+      window.speechSynthesis.cancel();
+      window.speechSynthesis.speak(utterance);
+      setTranslatedSpeaking(true);
+    } catch (error) {
+      console.error('Speech synthesis error:', error);
+      setTranslatedSpeaking(false);
+    }
   };
 
   const stopSpeaking = () => {
     window.speechSynthesis.cancel();
-    setSpeaking(false);
+    setExtractedSpeaking(false);
+    setTranslatedSpeaking(false);
   };
 
   const handleDownload = () => {
-    const element = document.createElement('a');
-    const file = new Blob([extractedText], { type: 'text/plain' });
+    const element = document.createElement("a");
+    const file = new Blob([extractedText], { type: "text/plain" });
     element.href = URL.createObjectURL(file);
-    element.download = 'extracted_text.txt';
+    element.download = "extracted_text.txt";
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
   };
 
+  const currentTranslations = languages[selectedLanguage].translations;
+
   return (
-    <div
-      className="min-h-screen bg-gradient-to-tr from-blue-50 via-white to-purple-50 px-6 py-12"
-      style={{
-        fontFamily: 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"',
-        fontSize: '14px',
-        fontWeight: 400,
-        lineHeight: 'normal',
-        color: '#000000'
-      }}
-    >
+    <div className="min-h-screen bg-gradient-to-tr from-blue-50 via-white to-purple-50 px-6 py-12">
       <div className="max-w-7xl mx-auto space-y-10">
+        <div className="flex justify-end mb-4">
+          <select
+            value={selectedLanguage}
+            onChange={(e) => setSelectedLanguage(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            {Object.entries(languages).map(([code, lang]) => (
+              <option key={code} value={code}>
+                {lang.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
         <div className="text-center">
-          <span className="text-sm font-semibold text-blue-600 uppercase tracking-wide bg-blue-100 rounded-full px-4 py-1 inline-block mb-3">Empowering Independence</span>
+          <span className="text-sm font-semibold text-blue-600 uppercase tracking-wide bg-blue-100 rounded-full px-4 py-1 inline-block mb-3">
+            {currentTranslations.subtitle}
+          </span>
           <h1 className="text-4xl sm:text-5xl font-extrabold">
-            PDF/Image <span className="text-blue-600">Analyzer</span>
+            <span className="text-blue-600">{currentTranslations.title}</span>
           </h1>
           <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
-            Upload an image or PDF and experience accessible, AI-powered text extraction and reading in your preferred language.
+            {currentTranslations.description}
           </p>
         </div>
 
         <div className="bg-white shadow-2xl rounded-3xl p-8 space-y-6">
-          <label htmlFor="file-upload" className="w-full flex flex-col items-center px-6 py-10 border-2 border-dashed border-blue-300 rounded-xl cursor-pointer hover:border-blue-400 transition">
+          <label
+            htmlFor="file-upload"
+            className="w-full flex flex-col items-center px-6 py-10 border-2 border-dashed border-blue-300 rounded-xl cursor-pointer hover:border-blue-400 transition"
+          >
             <Upload className="w-10 h-10 text-blue-500 mb-2" />
-            <span className="text-gray-500">{file ? file.name : 'Click or drag & drop to upload image or PDF'}</span>
-            <input id="file-upload" type="file" className="hidden" accept="image/*,application/pdf" onChange={handleFileChange} />
+            <span className="text-gray-500">
+              {file ? file.name : currentTranslations.uploadText}
+            </span>
+            <input
+              id="file-upload"
+              type="file"
+              className="hidden"
+              accept="image/*,application/pdf"
+              onChange={handleFileChange}
+            />
           </label>
 
           <div className="flex justify-center">
             <button
               onClick={handleAnalyze}
               disabled={!file || isProcessing}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium disabled:opacity-50 transition"
+              className="bg-blue-600 hover:bg-blue-7 text-white px-6 py-3 rounded-xl font-medium disabled:opacity-50 transition"
             >
-              {isProcessing ? 'Analyzing...' : 'Analyze Content'}
+              {isProcessing ? currentTranslations.analyzingText : currentTranslations.analyzeButton}
             </button>
           </div>
 
           {isProcessing && (
             <div className="w-full h-2 bg-gray-200 rounded-full">
-              <div className="h-2 bg-blue-600 rounded-full transition-all duration-300" style={{ width: `${progress * 100}%` }} />
+              <div
+                className="h-2 bg-blue-600 rounded-full transition-all duration-300"
+                style={{ width: `${progress * 100}%` }}
+              />
             </div>
           )}
         </div>
 
         {extractedText && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="bg-white rounded-3xl shadow-xl p-6 space-y-4">
-              <div className="flex justify-between items-center">
-                <h2 className="text-xl font-bold flex items-center">
-                  {fileType.startsWith('image/') ? <ImageIcon className="w-6 h-6 mr-2 text-blue-500" /> : <FileText className="w-6 h-6 mr-2 text-blue-500" />}
-                  Extracted Text
-                </h2>
-                <div className="flex gap-2">
-                  <select value={selectedLanguage} onChange={(e) => setSelectedLanguage(e.target.value)} className="border px-2 py-1 rounded-md text-sm">
-                    {languages.map(({ code, name }) => (
-                      <option key={code} value={code}>{name}</option>
-                    ))}
-                  </select>
-                  <button onClick={speaking ? stopSpeaking : startSpeaking} className={`px-3 py-2 text-sm rounded-md flex items-center ${speaking ? 'bg-red-100 text-red-600' : 'bg-blue-100 text-blue-600'}`}>
-                    {speaking ? <><PauseCircle className="w-4 h-4 mr-1" /> Stop</> : <><Play className="w-4 h-4 mr-1" /> Speak</>}
-                  </button>
-                  <button onClick={handleDownload} className="px-3 py-2 bg-green-100 text-green-700 text-sm rounded-md flex items-center hover:bg-green-200">
-                    <Download className="w-4 h-4 mr-1" /> Download
-                  </button>
+          <div className="grid grid-cols-1 gap-8">
+            {fileType === "application/pdf" ? (
+              // PDF View - Two columns side by side
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Extracted Text Box */}
+                <div className="bg-white rounded-3xl shadow-xl p-6 space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-xl font-bold flex items-center">
+                      <FileText className="w-6 h-6 mr-2 text-blue-500" />
+                      {currentTranslations.extractedText}
+                    </h2>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          if (extractedSpeaking) {
+                            stopSpeaking();
+                          } else {
+                            startExtractedSpeaking(extractedText, selectedLanguage);
+                          }
+                        }}
+                        className={`px-3 py-2 text-sm rounded-md flex items-center ${
+                          extractedSpeaking ? "bg-red-100 text-red-600" : "bg-blue-100 text-blue-600"
+                        }`}
+                        title={`Speak in ${languages[selectedLanguage].name}`}
+                      >
+                        {extractedSpeaking ? (
+                          <>
+                            <PauseCircle className="w-4 h-4 mr-1" /> {currentTranslations.stopButton}
+                          </>
+                        ) : (
+                          <>
+                            <Play className="w-4 h-4 mr-1" /> {currentTranslations.speakButton}
+                          </>
+                        )}
+                      </button>
+                      <button
+                        onClick={handleDownload}
+                        className="px-3 py-2 bg-green-100 text-green-700 text-sm rounded-md flex items-center hover:bg-green-200"
+                      >
+                        <Download className="w-4 h-4 mr-1" /> {currentTranslations.downloadButton}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-xl h-64 overflow-y-auto whitespace-pre-wrap text-gray-700">
+                    {extractedText}
+                  </div>
+                </div>
+                {/* Translated Text Box */}
+                <div className="bg-white rounded-3xl shadow-xl p-6 space-y-4">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center gap-4">
+                      <h2 className="text-xl font-bold flex items-center">
+                        <FileText className="w-6 h-6 mr-2 text-purple-500" />
+                        {currentTranslations.translatedText}
+                      </h2>
+                      <select
+                        value={targetLanguage}
+                        onChange={(e) => {
+                          setTargetLanguage(e.target.value);
+                          if (extractedText) {
+                            handleTranslate();
+                          }
+                        }}
+                        className="px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                      >
+                        {Object.entries(languages).map(([code, lang]) => (
+                          <option key={code} value={code}>
+                            {lang.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          if (translatedSpeaking) {
+                            stopSpeaking();
+                          } else {
+                            startTranslatedSpeaking(translatedText, targetLanguage);
+                          }
+                        }}
+                        className={`px-3 py-2 text-sm rounded-md flex items-center ${
+                          translatedSpeaking ? "bg-red-100 text-red-600" : "bg-purple-100 text-purple-600"
+                        }`}
+                        disabled={!translatedText}
+                      >
+                        {translatedSpeaking ? (
+                          <>
+                            <PauseCircle className="w-4 h-4 mr-1" /> {currentTranslations.stopButton}
+                          </>
+                        ) : (
+                          <>
+                            <Play className="w-4 h-4 mr-1" /> {currentTranslations.speakButton}
+                          </>
+                        )}
+                      </button>
+                      <button
+                        onClick={handleDownload}
+                        className="px-3 py-2 bg-purple-100 text-purple-700 text-sm rounded-md flex items-center hover:bg-purple-200"
+                      >
+                        <Download className="w-4 h-4 mr-1" /> {currentTranslations.downloadButton}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-xl h-64 overflow-y-auto whitespace-pre-wrap text-gray-700">
+                    {isTranslating ? (
+                      <div className="flex items-center justify-center h-full text-gray-500">
+                        <svg className="animate-spin h-5 w-5 mr-3 text-blue-500" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        Translating...
+                      </div>
+                    ) : translatedText && translatedText !== "Translation failed. Please try again." ? (
+                      translatedText
+                    ) : (
+                      <div className="flex items-center justify-center h-full text-gray-500">
+                        {translatedText === "Translation failed. Please try again." ? 
+                          <div className="text-red-500">{translatedText}</div> : 
+                          currentTranslations.translationPlaceholder
+                        }
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-              <div className="bg-gray-50 p-4 rounded-xl h-64 overflow-y-auto whitespace-pre-wrap text-gray-700">
-                {extractedText}
-              </div>
-            </div>
-
-            {imageData && fileType.startsWith('image/') && (
-              <div className="bg-white rounded-3xl shadow-xl p-6 space-y-4">
-                <h2 className="text-xl font-bold flex items-center">
-                  <ImageIcon className="w-6 h-6 mr-2 text-blue-500" /> Image Preview
-                </h2>
-                <div className="space-y-2">
-                  <label className="block text-sm">Contrast</label>
-                  <input type="range" min="50" max="200" value={imageSettings.contrast}
-                    onChange={(e) => setImageSettings(prev => ({ ...prev, contrast: e.target.value }))} className="w-full" />
-                  <label className="block text-sm">Brightness</label>
-                  <input type="range" min="50" max="200" value={imageSettings.brightness}
-                    onChange={(e) => setImageSettings(prev => ({ ...prev, brightness: e.target.value }))} className="w-full" />
-                  <label className="block text-sm">Grayscale</label>
-                  <input type="checkbox" checked={imageSettings.grayscale}
-                    onChange={(e) => setImageSettings(prev => ({ ...prev, grayscale: e.target.checked }))} />
+            ) : (
+              // Image View - Single column with image preview
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="bg-white rounded-3xl shadow-xl p-6 space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-xl font-bold flex items-center">
+                      <ImageIcon className="w-6 h-6 mr-2 text-blue-500" />
+                      {currentTranslations.extractedText}
+                    </h2>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => {
+                          if (extractedSpeaking) {
+                            stopSpeaking();
+                          } else {
+                            startExtractedSpeaking(extractedText, selectedLanguage);
+                          }
+                        }}
+                        className={`px-3 py-2 text-sm rounded-md flex items-center ${
+                          extractedSpeaking ? "bg-red-100 text-red-600" : "bg-blue-100 text-blue-600"
+                        }`}
+                      >
+                        {extractedSpeaking ? (
+                          <>
+                            <PauseCircle className="w-4 h-4 mr-1" /> {currentTranslations.stopButton}
+                          </>
+                        ) : (
+                          <>
+                            <Play className="w-4 h-4 mr-1" /> {currentTranslations.speakButton}
+                          </>
+                        )}
+                      </button>
+                      <button
+                        onClick={handleDownload}
+                        className="px-3 py-2 bg-green-100 text-green-700 text-sm rounded-md flex items-center hover:bg-green-200"
+                      >
+                        <Download className="w-4 h-4 mr-1" /> {currentTranslations.downloadButton}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 p-4 rounded-xl h-64 overflow-y-auto whitespace-pre-wrap text-gray-700">
+                    {extractedText}
+                  </div>
                 </div>
-                <div className="rounded-xl overflow-hidden bg-gray-100 border aspect-video">
-                  <img
-                    src={imageData}
-                    alt="Uploaded Preview"
-                    className="w-full h-full object-contain"
-                    style={{
-                      filter: `contrast(${imageSettings.contrast}%) brightness(${imageSettings.brightness}%) ${imageSettings.grayscale ? 'grayscale(100%)' : ''}`
-                    }}
-                  />
-                </div>
+                {imageData && (
+                  <div className="bg-white rounded-3xl shadow-xl p-6 space-y-4">
+                    <h2 className="text-xl font-bold flex items-center">
+                      <ImageIcon className="w-6 h-6 mr-2 text-blue-500" /> {currentTranslations.imagePreview}
+                    </h2>
+                    <div className="space-y-2">
+                      <label className="block text-sm">{currentTranslations.contrastLabel}</label>
+                      <input
+                        type="range"
+                        min="50"
+                        max="200"
+                        value={imageSettings.contrast}
+                        onChange={(e) =>
+                          setImageSettings((prev) => ({ ...prev, contrast: e.target.value }))
+                        }
+                        className="w-full"
+                      />
+                      <label className="block text-sm">{currentTranslations.brightnessLabel}</label>
+                      <input
+                        type="range"
+                        min="50"
+                        max="200"
+                        value={imageSettings.brightness}
+                        onChange={(e) =>
+                          setImageSettings((prev) => ({ ...prev, brightness: e.target.value }))
+                        }
+                        className="w-full"
+                      />
+                      <label className="block text-sm">{currentTranslations.grayscaleLabel}</label>
+                      <input
+                        type="checkbox"
+                        checked={imageSettings.grayscale}
+                        onChange={(e) =>
+                          setImageSettings((prev) => ({ ...prev, grayscale: e.target.checked }))
+                        }
+                      />
+                    </div>
+                    <div className="rounded-xl overflow-hidden bg-gray-100 border aspect-video">
+                      <img
+                        src={imageData}
+                        alt={currentTranslations.imagePreview}
+                        className="w-full h-full object-contain"
+                        style={{
+                          filter: `contrast(${imageSettings.contrast}%) brightness(${imageSettings.brightness}%) ${
+                            imageSettings.grayscale ? "grayscale(100%)" : ""
+                          }`
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>

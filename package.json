@@ -10,6 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@langchain/core": "^0.3.57",
+    "@langchain/openai": "^0.5.12",
     "@tailwindcss/vite": "^4.0.14",
     "dotenv": "^16.5.0",
     "lucide-react": "^0.513.0",
