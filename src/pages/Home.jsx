@@ -33,7 +33,8 @@ const IncluVerseLanding = () => {
     'busbuddybol',
     'signlang',
     'voicefeed',
-    'chatbot'
+    'chatbot',
+    'emergency'
   ]
 
   return (
