@@ -12,8 +12,10 @@ import Tesseract from "tesseract.js";
 import * as pdfjs from "pdfjs-dist";
 import workerSrc from "pdfjs-dist/build/pdf.worker.mjs?url";
 
-const callGroqAPI = async (textToTranslate, targetLang = "Hindi") => {
+const callGroqAPI = async (textToTranslate, targetLang) => {
   try {
+    console.log('Sending to API:', { targetLang, textToTranslate });
+
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -21,11 +23,11 @@ const callGroqAPI = async (textToTranslate, targetLang = "Hindi") => {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
+        model: "llama3-70b-8192",
         messages: [
           {
             role: "system",
-            content: `You are a translator. Translate the following English text to ${targetLang}.`
+            content: `You are a translator. Translate the following English text to ${targetLang}. Only return the translated text, nothing else.`
           },
           {
             role: "user",
@@ -37,20 +39,25 @@ const callGroqAPI = async (textToTranslate, targetLang = "Hindi") => {
     });
 
     if (!response.ok) {
-      // Log the full error response
       const error = await response.json();
       console.error('Groq API error:', error);
       throw new Error(`Groq API error: ${JSON.stringify(error)}`);
     }
 
     const data = await response.json();
-    return data.choices?.[0]?.message?.content?.trim();
+    const translatedText = data.choices?.[0]?.message?.content?.trim();
+    
+    // Verify that we got a translation and not the original text
+    if (translatedText === textToTranslate) {
+      throw new Error('Translation failed - received original text');
+    }
+    
+    return translatedText;
   } catch (error) {
     console.error('Groq API call failed:', error);
     throw error;
   }
 };
-
 
 pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
 
@@ -141,10 +148,10 @@ const ImageAnalyzer = () => {
         title: "ಪಿಡಿಎಫ್/ಚಿತ್ರ ವಿಶ್ಲೇಷಕ",
         subtitle: "ಸ್ವಾತಂತ್ರ್ಯವನ್ನು ಸ357ಕ್ತಗೊಳಿಸುವುದು",
         description:
-          "ಚಿತ್ರ ಅಥವಾ ಪಿಡಿಎಫ್ ಅನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ ಮತ್ತು ನಿಮ್ಮ ಆದ್ಯತೆಯ ಭಾಷೆಯಲ್ಲಿ ಪ್ರವೇಶಿಸಬಹುದಾದ, AI-ಸಾಮರ್ಥ್ಯದ ಪಠ್ಯ ಹೊರತೆಗೆಯುವಿಕೆ ಮತ್ತು ಓದುವಿಕೆಯನ್ನು ಅನುಭವಿಸಿ.",
+          "ಚಿತ್ರ ಅಥವಾ ಪಿಡಿಎಫ್ ಅನ್ನು ಅಪ್‌ಲೋಡ್ ಮಾಡಿ ಮತ್ತು ನಿಮ್ಮ ಆದ752ತೆಯ ಭಾಷೆಯಲ್ಲಿ ಪ್ರವೇಶಿಸಬಹುದಾದ, AI-ಸಾಮರ್ಥ್ಯದ ಪಠ್ಯ ಹೊರತೆಗೆಯುವಿಕೆ ಮತ್ತು ಓದುವಿಕೆಯನ್ನು ಅನುಭವಿಸಿ.",
         uploadText: "ಚಿತ್ರ ಅಥವಾ ಪಿಡಿಎಫ್ ಅಪ್‌ಲೋಡ್ ಮಾಡಲು ಕ್ಲಿಕ್ ಮಾಡಿ ಅಥವಾ ಎಳೆದು ಬಿಡಿ",
         analyzeButton: "ವಿಶ್ಲೇಷಿಸಿ",
-        analyzingText: "ವಿಶ್ಲೇಷಿಸಲಾಗುತ್ತಿದೆ...",
+        analyzingText: "ವ392ಲೇಷಿಸಲಾಗುತ್ತಿದೆ...",
         extractedText: "ಹೊರತೆಗೆದ ಪಠ್ಯ",
         translatedText: "ಅನುವಾದಿತ ಪಠ್ಯ",
         translationPlaceholder: "ಅನುವಾದಿತ ಪಠ್ಯವು ಇಲ್ಲಿ ಕಾಣಿಸುತ್ತದೆ...",
@@ -165,7 +172,7 @@ const ImageAnalyzer = () => {
         subtitle: "சுதந்த274த்தை மேம்படுத்துதல்",
         description:
           "படம் அல்லது பிடிஎஃப் பதிவேற்றி உங்கள் விருப்பமான மொழியில் அணுகக்கூடிய, AI-இயக்கப்பட்ட உரை பிரித்தெடுத்தல் மற்றும் வாசிப்பை அனுபவியுங்கள்.",
-        uploadText: "படம் அல்லது பிடிஎஃப் பதிவேற்ற கிளிக் செய்யவும் அல்லது இழுத்து விடவும்",
+        upload012Text: "படம் அல்லது பிடிஎஃப் பதிவேற்ற கிளிக் செய்யவும் அல்லது இழுத்து விடவும்",
         analyzeButton: "பகுப்பாய்வு செய்",
         analyzingText: "பகுப்பாய்வு செய்கிறது...",
         extractedText: "பிரித்தெடுக்கப்பட்ட உரை",
@@ -184,17 +191,17 @@ const ImageAnalyzer = () => {
     "te-IN": {
       name: "తెలుగు",
       translations: {
-        title: "పిడిఎఫ్/ఇమేజ్ విశ్లేషకుడు",
+        title: "పిడ101ఎఫ్/ఇమేజ్ విశ్లేషకుడు",
         subtitle: "స్వాతంత్ర్యాన్ని బలోపేతం చేయడం",
         description:
           "చిత్రం లేదా పిడిఎఫ్‌ను అప్‌లోడ్ చేసి మీకు ఇష్టమైన భాషలో అందుబాటులో ఉన్న, AI-ఆధారిత వచన సేకరణ మరియు చదవడాన్ని అనుభవించండి.",
-        uploadText: "చిత్రం లేదా పిడిఎఫ్ అప్‌లోడ్ చేయడానికి క్లిక్ చేయండి లేదా డ్రాగ్ చేసి డ్రాప్ చేయండి",
+        uploadText: "చిత్రం లేదా పిడిఎః అప్‌లోడ్ చేయడానికి క్లిక్ చేయండి లేదా డ్రాగ్ చేసి డ్రాప్ చేయండి",
         analyzeButton: "విశ్లేషించు",
         analyzingText: "విశ్లేషిస్తోంది...",
         extractedText: "సేకరించిన వచనం",
         translatedText: "అనువదించబడిన వచనం",
-        translationPlaceholder: "అనువదించబడిన వచನం ఇక్కడ కనిపిస్తుంది...",
-        invalidFile: "ద422చేసి చెల్లుబాటు అయ్యే చిత్రం లేదా పిడిఎఫ్ ఫైల్‌ను అప్‌లోడ్ చేయండి.",
+        translationPlaceholder: "అనువదించబడిన వచనం ఇక్కడ కనిపిస్తುంది...",
+        invalidFile: "దయచేసి చెల్లుబాటు అయ్యే చిత్రం లేదా పిడిఎఫ్ ఫైల్‌ను అప్‌లోడ్ చేయండి.",
         speakButton: "మాట్లాడు",
         stopButton: "ఆపు",
         downloadButton: "డౌన్‌లోడ్",
@@ -206,7 +213,7 @@ const ImageAnalyzer = () => {
     },
   };
 
-  const getLanguageClass = (langCode) => {
+  const get102LanguageClass = (langCode) => {
     switch (langCode) {
       case 'hi-IN':
         return 'font-hindi';
@@ -240,11 +247,12 @@ const ImageAnalyzer = () => {
     grayscale: false,
   });
   const speechSynthesisRef = useRef(null);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState(null);
 
   useEffect(() => {
     const loadVoices = () => {
       const voices = window.speechSynthesis.getVoices();
-      if (voices.length === 0) {
+     if (voices.length === 0) {
         setTimeout(loadVoices, 100);
       } else {
         setAvailableVoices(voices);
@@ -273,6 +281,11 @@ const ImageAnalyzer = () => {
         stopSpeaking();
       }
       setImageData(URL.createObjectURL(selectedFile));
+      if (selectedFile.type === "application/pdf") {
+        renderPdfPreview(selectedFile);
+      } else {
+        setPdfPreviewUrl(null);
+      }
     }
   };
 
@@ -305,7 +318,7 @@ const ImageAnalyzer = () => {
       }
       return text;
     } catch (error) {
-      console.error("Error processing PDF:", error);
+     console.error("Error processing PDF:", error);
       return "";
     }
   };
@@ -320,8 +333,10 @@ const ImageAnalyzer = () => {
         'te-IN': 'Telugu',
         'en-US': 'English'
       };
+
+      // Get the target language name from the map
       const targetApiLang = languageMap[targetLang];
-      
+
       if (!targetApiLang) {
         throw new Error('Invalid target language');
       }
@@ -332,10 +347,15 @@ const ImageAnalyzer = () => {
 
       for (const chunk of chunks) {
         if (!chunk.trim()) continue;
-        const result = await callGroqAPI(chunk.trim(), targetApiLang);
-        translatedChunks.push(result);
-        // Add small delay between chunks
-        await new Promise(resolve => setTimeout(resolve, 300));
+        // Only translate if target language is not English
+        if (targetApiLang !== 'English') {
+          const result = await callGroqAPI(chunk.trim(), targetApiLang);
+          translatedChunks.push(result);
+          // Add small delay between chunks
+          await new Promise(resolve => setTimeout(resolve, 300));
+        } else {
+          translatedChunks.push(chunk.trim());
+        }
       }
 
       return translatedChunks.join(' ');
@@ -394,9 +414,8 @@ const ImageAnalyzer = () => {
     }
   };
 
-  const startExtractedSpeaking = (text, lang) => {
+  const start105ExtractedSpeaking = (text, lang) => {
     if (!text) return;
-
     try {
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.lang = lang;
@@ -440,20 +459,15 @@ const ImageAnalyzer = () => {
       utterance.lang = lang;
       
       const voices = window.speechSynthesis.getVoices();
-      console.log('Available voices:', voices.map(v => `${v.name} (${v.lang})`));
-      console.log('Target language:', lang);
-      
       // Try to find an exact match first
       let voice = voices.find(v => v.lang === lang);
-      
       // If no exact match, try to find a match for the base language
       if (!voice) {
         const baseLang = lang.split('-')[0];
-        voice = voices.find(v => v.lang.startsWith(baseLang));
+        voice = voices.find(v => v163.lang.startsWith(baseLang));
       }
       
       if (voice) {
-        console.log('Selected voice:', `${voice.name} (${voice.lang})`);
         utterance.voice = voice;
       } else {
         console.warn(`No voice found for language ${lang}, using default voice`);
@@ -499,14 +513,59 @@ const ImageAnalyzer = () => {
 
   const currentTranslations = languages[selectedLanguage].translations;
 
+  // New download function for the currently displayed text (extracted or translated)
+  const handleCurrentDownload = () => {
+    const textToDownload = isTranslating || target164Language !== "en-US" ? translatedText : extractedText;
+    const element = document.createElement("a");
+    const file = new Blob([textToDownload], { type: "text/plain" });
+    element.href = URL.createObjectURL(file);
+    element.download = `text_${targetLanguage}.txt`;
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
+  };
+
+  const renderPdfPreview = async (pdfFile) => {
+    try {
+      const arrayBuffer = await pdfFile.arrayBuffer();
+      const pdf = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+      const page = await pdf.getPage(1);
+      const viewport = page.getViewport({ scale: 1.5 });
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d');
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+      await page.render({ canvasContext: context, viewport }).promise;
+      setPdfPreviewUrl(canvas.toDataURL());
+    } catch (error) {
+      setPdfPreviewUrl(null);
+      console.error('Error rendering PDF preview:', error);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-tr from-blue-50 via-white to-purple-50 px-6 py-12">
-      <div className="max-w-7xl mx-auto space-y-10">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50" style={{ fontFamily: 'HelveticaNeueW01-55Roma, Helvetica, Arial, sans-serif' }}>
+      <div className="max-w-7xl mx-auto p-4 sm:p-6">
+        {/* Header */}
+        <div className="text-center mb-6 sm:mb-10 relative">
+          <div className="inline-flex items-center px-3 sm:px-5 py-2 sm:py-3 bg-blue-100 text-blue-600 rounded-full text-sm sm:text-base font-medium mb-4 sm:mb-6">
+            <ImageIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-2" aria-hidden="true" />
+            {currentTranslations.subtitle}
+          </div>
+          <h1 className="text-3xl sm:text-5xl font-bold text-gray-900 mb-2 sm:mb-3">
+            <span className="text-blue-600">{currentTranslations.title}</span>
+          </h1>
+          <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto">
+            {currentTranslations.description}
+          </p>
+        </div>
+
+        {/* Language Selector */}
         <div className="flex justify-end mb-4">
           <select
             value={selectedLanguage}
             onChange={(e) => setSelectedLanguage(e.target.value)}
-            className="px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-3 py-2 border border-gray-300 rounded-xl shadow-sm focus:outline-none focus:ring-4 focus:ring-blue-300 text-sm sm:text-base"
           >
             {Object.entries(languages).map(([code, lang]) => (
               <option key={code} value={code}>
@@ -516,25 +575,14 @@ const ImageAnalyzer = () => {
           </select>
         </div>
 
-        <div className="text-center">
-          <span className="text-sm font-semibold text-blue-600 uppercase tracking-wide bg-blue-100 rounded-full px-4 py-1 inline-block mb-3">
-            {currentTranslations.subtitle}
-          </span>
-          <h1 className="text-4xl sm:text-5xl font-extrabold">
-            <span className="text-blue-600">{currentTranslations.title}</span>
-          </h1>
-          <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
-            {currentTranslations.description}
-          </p>
-        </div>
-
-        <div className="bg-white shadow-2xl rounded-3xl p-8 space-y-6">
+        {/* Upload Card */}
+        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-10 mb-6 sm:mb-10">
           <label
             htmlFor="file-upload"
             className="w-full flex flex-col items-center px-6 py-10 border-2 border-dashed border-blue-300 rounded-xl cursor-pointer hover:border-blue-400 transition"
           >
             <Upload className="w-10 h-10 text-blue-500 mb-2" />
-            <span className="text-gray-500">
+            <span className="text-gray-500 text-sm sm:text-base">
               {file ? file.name : currentTranslations.uploadText}
             </span>
             <input
@@ -546,18 +594,18 @@ const ImageAnalyzer = () => {
             />
           </label>
 
-          <div className="flex justify-center">
+          <div className="flex justify-center mt-6">
             <button
               onClick={handleAnalyze}
               disabled={!file || isProcessing}
-              className="bg-blue-600 hover:bg-blue-7 text-white px-6 py-3 rounded-xl font-medium disabled:opacity-50 transition"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium disabled:opacity-50 transition text-base sm:text-lg"
             >
               {isProcessing ? currentTranslations.analyzingText : currentTranslations.analyzeButton}
             </button>
           </div>
 
           {isProcessing && (
-            <div className="w-full h-2 bg-gray-200 rounded-full">
+            <div className="w-full h-2 bg-gray-200 rounded-full mt-4">
               <div
                 className="h-2 bg-blue-600 rounded-full transition-all duration-300"
                 style={{ width: `${progress * 100}%` }}
@@ -566,228 +614,209 @@ const ImageAnalyzer = () => {
           )}
         </div>
 
-        {extractedText && (
-          <div className="grid grid-cols-1 gap-8">
-            {fileType === "application/pdf" ? (
-              // PDF View - Two columns side by side
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Extracted Text Box */}
-                <div className="bg-white rounded-3xl shadow-xl p-6 space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-bold flex items-center">
-                      <FileText className="w-6 h-6 mr-2 text-blue-500" />
-                      {currentTranslations.extractedText}
-                    </h2>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => {
-                          if (extractedSpeaking) {
-                            stopSpeaking();
-                          } else {
-                            startExtractedSpeaking(extractedText, selectedLanguage);
-                          }
-                        }}
-                        className={`px-3 py-2 text-sm rounded-md flex items-center ${
-                          extractedSpeaking ? "bg-red-100 text-red-600" : "bg-blue-100 text-blue-600"
-                        }`}
-                        title={`Speak in ${languages[selectedLanguage].name}`}
-                      >
-                        {extractedSpeaking ? (
-                          <>
-                            <PauseCircle className="w-4 h-4 mr-1" /> {currentTranslations.stopButton}
-                          </>
-                        ) : (
-                          <>
-                            <Play className="w-4 h-4 mr-1" /> {currentTranslations.speakButton}
-                          </>
-                        )}
-                      </button>
-                      <button
-                        onClick={handleDownload}
-                        className="px-3 py-2 bg-green-100 text-green-700 text-sm rounded-md flex items-center hover:bg-green-200"
-                      >
-                        <Download className="w-4 h-4 mr-1" /> {currentTranslations.downloadButton}
-                      </button>
-                    </div>
-                  </div>
-                  <div className="bg-gray-50 p-4 rounded-xl h-64 overflow-y-auto whitespace-pre-wrap text-gray-700">
-                    {extractedText}
-                  </div>
+        {/* Extracted Text & Preview */}
+        {extractedText && fileType === "application/pdf" && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 h-[32rem]">
+            <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-10 space-y-4 flex flex-col h-full">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-4">
+                  <h2 className="text-xl sm:text-2xl font-bold flex items-center">
+                    <FileText className="w-6 h-6 sm:w-7 sm:h-7 mr-2 text-blue-500" />
+                    {isTranslating ? currentTranslations.translatedText : currentTranslations.extractedText}
+                  </h2>
+                  <select
+                    value={targetLanguage}
+                    onChange={(e) => {
+                      setTargetLanguage(e.target.value);
+                      if (extractedText) {
+                        handleTranslate();
+                      }
+                    }}
+                    className="px-2 py-1 border border-gray-300 rounded-xl text-sm sm:text-base focus:outline-none focus:ring-4 focus:ring-purple-300"
+                  >
+                    {Object.entries(languages).map(([code, lang]) => (
+                      <option key={code} value={code}>
+                        {lang.name}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                {/* Translated Text Box */}
-                <div className="bg-white rounded-3xl shadow-xl p-6 space-y-4">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center gap-4">
-                      <h2 className="text-xl font-bold flex items-center">
-                        <FileText className="w-6 h-6 mr-2 text-purple-500" />
-                        {currentTranslations.translatedText}
-                      </h2>
-                      <select
-                        value={targetLanguage}
-                        onChange={(e) => {
-                          setTargetLanguage(e.target.value);
-                          if (extractedText) {
-                            handleTranslate();
-                          }
-                        }}
-                        className="px-2 py-1 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
-                      >
-                        {Object.entries(languages).map(([code, lang]) => (
-                          <option key={code} value={code}>
-                            {lang.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => {
-                          if (translatedSpeaking) {
-                            stopSpeaking();
-                          } else {
-                            startTranslatedSpeaking(translatedText, targetLanguage);
-                          }
-                        }}
-                        className={`px-3 py-2 text-sm rounded-md flex items-center ${
-                          translatedSpeaking ? "bg-red-100 text-red-600" : "bg-purple-100 text-purple-600"
-                        }`}
-                        disabled={!translatedText}
-                      >
-                        {translatedSpeaking ? (
-                          <>
-                            <PauseCircle className="w-4 h-4 mr-1" /> {currentTranslations.stopButton}
-                          </>
-                        ) : (
-                          <>
-                            <Play className="w-4 h-4 mr-1" /> {currentTranslations.speakButton}
-                          </>
-                        )}
-                      </button>
-                      <button
-                        onClick={handleDownload}
-                        className="px-3 py-2 bg-purple-100 text-purple-700 text-sm rounded-md flex items-center hover:bg-purple-200"
-                      >
-                        <Download className="w-4 h-4 mr-1" /> {currentTranslations.downloadButton}
-                      </button>
-                    </div>
-                  </div>
-                  <div className="bg-gray-50 p-4 rounded-xl h-64 overflow-y-auto whitespace-pre-wrap text-gray-700">
-                    {isTranslating ? (
-                      <div className="flex items-center justify-center h-full text-gray-500">
-                        <svg className="animate-spin h-5 w-5 mr-3 text-blue-500" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                        </svg>
-                        Translating...
-                      </div>
-                    ) : translatedText && translatedText !== "Translation failed. Please try again." ? (
-                      translatedText
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      const textToSpeak = isTranslating || targetLanguage !== "en-US" ? translatedText : extractedText;
+                      const langToSpeak = isTranslating || targetLanguage !== "en-US" ? targetLanguage : selectedLanguage;
+                      if (translatedSpeaking || extractedSpeaking) {
+                        stopSpeaking();
+                      } else if (textToSpeak) {
+                        startTranslatedSpeaking(textToSpeak, langToSpeak);
+                      }
+                    }}
+                    className={`px-3 py-2 text-sm sm:text-base rounded-xl flex items-center ${
+                      translatedSpeaking || extractedSpeaking ? "bg-red-100 text-red-600" : "bg-blue-100 text-blue-600"
+                    }`}
+                    disabled={!extractedText}
+                  >
+                    {translatedSpeaking || extractedSpeaking ? (
+                      <>
+                        <PauseCircle className="w-4 h-4 mr-1" /> {currentTranslations.stopButton}
+                      </>
                     ) : (
-                      <div className="flex items-center justify-center h-full text-gray-500">
-                        {translatedText === "Translation failed. Please try again." ? 
-                          <div className="text-red-500">{translatedText}</div> : 
-                          currentTranslations.translationPlaceholder
-                        }
-                      </div>
+                      <>
+                        <Play className="w-4 h-4 mr-1" /> {currentTranslations.speakButton}
+                      </>
                     )}
-                  </div>
+                  </button>
+                  <button
+                    onClick={handleCurrentDownload}
+                    className="px-3 py-2 bg-green-100 text-green-700 text-sm sm:text-base rounded-xl flex items-center hover:bg-green-200"
+                  >
+                    <Download className="w-4 h-4 mr-1" /> {currentTranslations.downloadButton}
+                  </button>
                 </div>
               </div>
-            ) : (
-              // Image View - Single column with image preview
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="bg-white rounded-3xl shadow-xl p-6 space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-bold flex items-center">
-                      <ImageIcon className="w-6 h-6 mr-2 text-blue-500" />
-                      {currentTranslations.extractedText}
-                    </h2>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => {
-                          if (extractedSpeaking) {
-                            stopSpeaking();
-                          } else {
-                            startExtractedSpeaking(extractedText, selectedLanguage);
-                          }
-                        }}
-                        className={`px-3 py-2 text-sm rounded-md flex items-center ${
-                          extractedSpeaking ? "bg-red-100 text-red-600" : "bg-blue-100 text-blue-600"
-                        }`}
-                      >
-                        {extractedSpeaking ? (
-                          <>
-                            <PauseCircle className="w-4 h-4 mr-1" /> {currentTranslations.stopButton}
-                          </>
-                        ) : (
-                          <>
-                            <Play className="w-4 h-4 mr-1" /> {currentTranslations.speakButton}
-                          </>
-                        )}
-                      </button>
-                      <button
-                        onClick={handleDownload}
-                        className="px-3 py-2 bg-green-100 text-green-700 text-sm rounded-md flex items-center hover:bg-green-200"
-                      >
-                        <Download className="w-4 h-4 mr-1" /> {currentTranslations.downloadButton}
-                      </button>
-                    </div>
+              <div className="bg-gray-50 p-4 rounded-xl flex-1 overflow-y-auto whitespace-pre-wrap text-gray-700 text-sm sm:text-lg" style={getLanguageStyle(targetLanguage)}>
+                {isTranslating ? (
+                  <div className="flex items-center justify-center h-full text-gray-500">
+                    <svg className="animate-spin h-5 w-5 mr-3 text-blue-500" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    {currentTranslations.analyzingText}
                   </div>
-                  <div className="bg-gray-50 p-4 rounded-xl h-64 overflow-y-auto whitespace-pre-wrap text-gray-700">
-                    {extractedText}
-                  </div>
-                </div>
-                {imageData && (
-                  <div className="bg-white rounded-3xl shadow-xl p-6 space-y-4">
-                    <h2 className="text-xl font-bold flex items-center">
-                      <ImageIcon className="w-6 h-6 mr-2 text-blue-500" /> {currentTranslations.imagePreview}
-                    </h2>
-                    <div className="space-y-2">
-                      <label className="block text-sm">{currentTranslations.contrastLabel}</label>
-                      <input
-                        type="range"
-                        min="50"
-                        max="200"
-                        value={imageSettings.contrast}
-                        onChange={(e) =>
-                          setImageSettings((prev) => ({ ...prev, contrast: e.target.value }))
-                        }
-                        className="w-full"
-                      />
-                      <label className="block text-sm">{currentTranslations.brightnessLabel}</label>
-                      <input
-                        type="range"
-                        min="50"
-                        max="200"
-                        value={imageSettings.brightness}
-                        onChange={(e) =>
-                          setImageSettings((prev) => ({ ...prev, brightness: e.target.value }))
-                        }
-                        className="w-full"
-                      />
-                      <label className="block text-sm">{currentTranslations.grayscaleLabel}</label>
-                      <input
-                        type="checkbox"
-                        checked={imageSettings.grayscale}
-                        onChange={(e) =>
-                          setImageSettings((prev) => ({ ...prev, grayscale: e.target.checked }))
-                        }
-                      />
-                    </div>
-                    <div className="rounded-xl overflow-hidden bg-gray-100 border aspect-video">
-                      <img
-                        src={imageData}
-                        alt={currentTranslations.imagePreview}
-                        className="w-full h-full object-contain"
-                        style={{
-                          filter: `contrast(${imageSettings.contrast}%) brightness(${imageSettings.brightness}%) ${
-                            imageSettings.grayscale ? "grayscale(100%)" : ""
-                          }`
-                        }}
-                      />
-                    </div>
-                  </div>
+                ) : (targetLanguage === "en-US" || !translatedText || translatedText === "Translation failed. The text could not be translated.") ? (
+                  extractedText
+                ) : (
+                  translatedText
                 )}
+              </div>
+            </div>
+            <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-10 space-y-4 flex flex-col h-full items-center justify-center">
+              <h2 className="text-xl sm:text-2xl font-bold flex items-center mb-4">
+                <FileText className="w-6 h-6 sm:w-7 sm:h-7 mr-2 text-blue-500" /> PDF Preview
+              </h2>
+              <div className="flex-1 w-full flex items-center justify-center">
+                {pdfPreviewUrl && (
+                  <img src={pdfPreviewUrl} alt="PDF Preview" className="w-full h-auto max-h-full rounded-xl border object-contain" />
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {extractedText && fileType && fileType.startsWith("image/") && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-10 space-y-4 flex flex-col h-full">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-4">
+                  <h2 className="text-xl sm:text-2xl font-bold flex items-center">
+                    <FileText className="w-6 h-6 sm:w-7 sm:h-7 mr-2 text-blue-500" />
+                    {currentTranslations.extractedText}
+                  </h2>
+                  <select
+                    value={targetLanguage}
+                    onChange={(e) => {
+                      setTargetLanguage(e.target.value);
+                      if (extractedText) {
+                        handleTranslate();
+                      }
+                    }}
+                    className="px-2 py-1 border border-gray-300 rounded-xl text-sm sm:text-base focus:outline-none focus:ring-4 focus:ring-purple-300"
+                  >
+                    {Object.entries(languages).map(([code, lang]) => (
+                      <option key={code} value={code}>
+                        {lang.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => {
+                      const textToSpeak = extractedText;
+                      const langToSpeak = targetLanguage;
+                      if (extractedSpeaking) {
+                        stopSpeaking();
+                      } else if (textToSpeak) {
+                        start105ExtractedSpeaking(textToSpeak, langToSpeak);
+                      }
+                    }}
+                    className={`px-3 py-2 text-sm sm:text-base rounded-xl flex items-center ${
+                      extractedSpeaking ? "bg-red-100 text-red-600" : "bg-blue-100 text-blue-600"
+                    }`}
+                    disabled={!extractedText}
+                  >
+                    {extractedSpeaking ? (
+                      <>
+                        <PauseCircle className="w-4 h-4 mr-1" /> {currentTranslations.stopButton}
+                      </>
+                    ) : (
+                      <>
+                        <Play className="w-4 h-4 mr-1" /> {currentTranslations.speakButton}
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={handleCurrentDownload}
+                    className="px-3 py-2 bg-green-100 text-green-700 text-sm sm:text-base rounded-xl flex items-center hover:bg-green-200"
+                  >
+                    <Download className="w-4 h-4 mr-1" /> {currentTranslations.downloadButton}
+                  </button>
+                </div>
+              </div>
+              <div className="bg-gray-50 p-4 rounded-xl flex-1 overflow-y-auto whitespace-pre-wrap text-gray-700 text-sm sm:text-lg" style={getLanguageStyle(targetLanguage)}>
+                {extractedText}
+              </div>
+            </div>
+            {imageData && (
+              <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-10 space-y-4">
+                <h2 className="text-xl font-bold flex items-center">
+                  <ImageIcon className="w-6 h-6 mr-2 text-blue-500" /> {currentTranslations.imagePreview}
+                </h2>
+                <div className="space-y-2">
+                  <label className="block text-sm">{currentTranslations.contrastLabel}</label>
+                  <input
+                    type="range"
+                    min="50"
+                    max="200"
+                    value={imageSettings.contrast}
+                    onChange={(e) =>
+                      setImageSettings((prev) => ({ ...prev, contrast: e.target.value }))
+                    }
+                    className="w-full"
+                  />
+                  <label className="block text-sm">{currentTranslations.brightnessLabel}</label>
+                  <input
+                    type="range"
+                    min="50"
+                    max="200"
+                    value={imageSettings.brightness}
+                    onChange={(e) =>
+                      setImageSettings((prev) => ({ ...prev, brightness: e.target.value }))
+                    }
+                    className="w-full"
+                  />
+                  <label className="block text-sm">{currentTranslations.grayscaleLabel}</label>
+                  <input
+                    type="checkbox"
+                    checked={imageSettings.grayscale}
+                    onChange={(e) =>
+                      setImageSettings((prev) => ({ ...prev, grayscale: e.target.checked }))
+                    }
+                  />
+                </div>
+                <div className="rounded-xl overflow-hidden bg-gray-100 border aspect-video">
+                  <img
+                    src={imageData}
+                    alt={currentTranslations.imagePreview}
+                    className="w-full h-full object-contain"
+                    style={{
+                      filter: `contrast(${imageSettings.contrast}%) brightness(${imageSettings.brightness}%) ${
+                        imageSettings.grayscale ? "grayscale(100%)" : ""
+                      }`
+                    }}
+                  />
+                </div>
               </div>
             )}
           </div>
