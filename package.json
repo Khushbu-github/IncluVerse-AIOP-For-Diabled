@@ -15,6 +15,7 @@
     "@langchain/core": "^0.3.57",
     "@langchain/openai": "^0.5.12",
     "@mui/material": "^7.1.1",
+    "@splinetool/react-spline": "^4.0.0",
     "@tailwindcss/vite": "^4.0.14",
     "@tensorflow-models/handpose": "^0.1.0",
     "@tensorflow/tfjs": "^4.22.0",
@@ -25,7 +26,8 @@
     "react-router-dom": "^7.6.2",
     "react-webcam": "^7.2.0",
     "tailwindcss": "^4.0.14",
-    "tesseract.js": "^6.0.1"
+    "tesseract.js": "^6.0.1",
+    "three": "^0.177.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
