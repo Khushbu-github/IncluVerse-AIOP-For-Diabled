@@ -136,9 +136,9 @@ const Chatbot = () => {
       }
     },
     "grievance": {
-      path: "/greviance",
+      path: "/grievance",
       variations: {
-        "en-IN": ["grievance", "greviance", "complaint", "issue", "problem", "report", "feedback", "concern", "help"],
+        "en-IN": ["grievance", "complaint", "issue", "problem", "report", "feedback", "concern", "help"],
         "hi-IN": ["शिकायत", "समस्या", "मुद्दा", "रिपोर्ट", "फीडबैक", "चिंता", "सहायता", "दूरू"],
         "kn-IN": ["ದೂರು", "ಸಮಸ್ಯೆ", "ವರದಿ", "ಪ್ರತಿಕ್ರಿಯೆ", "ಕಾಳಜಿ", "ಸಹಾಯ"],
         "ta-IN": ["புகார்", "பிரச்சினை", "அறிக்கை", "கருத்து", "கவலை", "உதவி"]

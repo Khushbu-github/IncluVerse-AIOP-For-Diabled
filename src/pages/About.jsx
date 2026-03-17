@@ -61,7 +61,7 @@ const IncluVerseAbout = () => {
   ];
   const pages = [
     'img_analyzer',
-    'greviance',
+    'grievance',
     'busbuddybol',
     'signlang',
     'voicefeed',

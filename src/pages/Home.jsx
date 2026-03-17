@@ -73,7 +73,7 @@ const IncluVerseLanding = () => {
   ];
   const pages = [
     'img_analyzer',
-    'greviance',
+    'grievance',
     'busbuddybol',
     'signlang',
     'chatbot',
